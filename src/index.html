@@ -1,0 +1,2338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRCCRE质监"三阶四验"</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
+    <style>
+        :root {
+            --primary: #1a3c5e;
+            --primary-light: #2c5f8a;
+            --accent: #e8a817;
+            --danger: #d94040;
+            --warning: #e8a817;
+            --success: #3a9d5d;
+            --bg: #f0f3f6;
+            --card-bg: #fff;
+            --border: #dde1e6;
+            --text: #2c3e50;
+            --text-secondary: #6b7d8e;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+            --radius: 10px;
+            --transition: 0.2s ease;
+            --font-mono: 'SF Mono', 'Consolas', 'Monaco', monospace;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        /* 顶部导航 */
+        .app-header {
+            background: var(--primary);
+            color: #fff;
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+        }
+        .app-header .logo {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .app-header .logo .icon {
+            width: 34px;
+            height: 34px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #1a3c5e;
+            font-size: 1.1rem;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .user-badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            transition: var(--transition);
+        }
+        .user-badge:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #1a3c5e;
+        }
+        .btn-primary:hover {
+            background: #f0b830;
+            transform: translateY(-1px);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid rgba(255, 255, 255, 0.5);
+            color: #fff;
+        }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.78rem;
+            border-radius: 4px;
+        }
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+        .btn-ghost {
+            background: #e9ecef;
+            color: #495057;
+        }
+        .btn-ghost:hover {
+            background: #dee2e6;
+        }
+        /* 主导航标签 */
+        .main-nav {
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 0;
+            padding: 0 20px;
+            overflow-x: auto;
+            flex-shrink: 0;
+            position: sticky;
+            top: 56px;
+            z-index: 99;
+        }
+        .main-nav .nav-tab {
+            padding: 13px 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+            white-space: nowrap;
+            user-select: none;
+        }
+        .main-nav .nav-tab:hover {
+            color: var(--primary);
+            background: #f8f9fa;
+        }
+        .main-nav .nav-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--accent);
+            font-weight: 600;
+        }
+        /* 主内容区 */
+        .main-content {
+            padding: 20px 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* 卡片 */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            margin-bottom: 18px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .card-header {
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 14px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .card-header .badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+        .badge-red {
+            background: #fde8e8;
+            color: #b91c1c;
+        }
+        .badge-yellow {
+            background: #fef3cd;
+            color: #856404;
+        }
+        .badge-green {
+            background: #d4edda;
+            color: #155724;
+        }
+        .badge-blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .badge-gray {
+            background: #e9ecef;
+            color: #495057;
+        }
+        /* 表单 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 14px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 9px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            font-family: inherit;
+            background: #fafbfc;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(44, 95, 138, 0.1);
+            background: #fff;
+        }
+        .form-group input:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+        /* 表格 */
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 800px;
+        }
+        table th,
+        table td {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            text-align: center;
+            vertical-align: middle;
+        }
+        table th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: var(--primary);
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+        }
+        table tbody tr:hover {
+            background: #f8fafc;
+        }
+        .text-left {
+            text-align: left;
+        }
+        .text-red {
+            color: #d94040;
+            font-weight: 600;
+        }
+        .cell-red {
+            background: #ffe0e0 !important;
+            color: #b91c1c;
+            font-weight: 600;
+        }
+        .cell-yellow {
+            background: #fff9db !important;
+        }
+        .cell-green {
+            background: #e6f4ec !important;
+        }
+        .cell-blue {
+            background: #e3f0fd !important;
+        }
+        .cell-pink {
+            background: #fde8f0 !important;
+        }
+        /* 项目卡片 */
+        .project-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 16px;
+        }
+        .project-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            border-left: 4px solid transparent;
+        }
+        .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        .project-card.warn-yellow {
+            border-left-color: var(--warning);
+        }
+        .project-card.warn-red {
+            border-left-color: var(--danger);
+            animation: pulse-red 2s infinite;
+        }
+        @keyframes pulse-red {
+            0%,
+            100% {
+                box-shadow: 0 2px 12px rgba(217, 64, 64, 0.15);
+            }
+            50% {
+                box-shadow: 0 4px 24px rgba(217, 64, 64, 0.15);
+            }
+        }
+        .project-card .card-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .project-card .card-meta {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .project-card .card-meta span {
+            background: #f1f5f9;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        .warn-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+        .warn-dot.red {
+            background: #d94040;
+            animation: blink 1s infinite;
+        }
+        .warn-dot.yellow {
+            background: #e8a817;
+        }
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+        /* 弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+        .modal {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 800px;
+            width: 95%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+        .modal h3 {
+            margin-bottom: 16px;
+            color: var(--primary);
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+        /* 图表容器 */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-height: 350px;
+        }
+        .chart-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 16px;
+        }
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #333;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 999;
+            font-size: 0.9rem;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .toast.success {
+            background: #3a9d5d;
+        }
+        .toast.error {
+            background: #d94040;
+        }
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .project-cards {
+                grid-template-columns: 1fr;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .chart-row {
+                grid-template-columns: 1fr;
+            }
+            .main-nav .nav-tab {
+                padding: 10px 12px;
+                font-size: 0.78rem;
+            }
+            .app-header .logo {
+                font-size: 0.95rem;
+            }
+            .main-content {
+                padding: 12px 10px;
+            }
+        }
+        .photo-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .photo-preview img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+        }
+        .photo-preview .photo-item {
+            position: relative;
+            display: inline-block;
+        }
+        .photo-preview .photo-item .del-photo {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #d94040;
+            color: #fff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .highlight-num {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .stat-mini {
+            text-align: center;
+            padding: 10px;
+        }
+        .stat-mini .val {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .stat-mini .lbl {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        /* 放大图片模态框 */
+        .img-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .img-modal-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .img-modal-content img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        /* 状态颜色样式 */
+        .status-unstarted { background-color: #6b7d8e !important; color: white; }
+        .status-under-construction { background-color: #2c5f8a !important; color: white; }
+        .status-ready-delivery { background-color: #e8a817 !important; color: black; }
+        .status-stopped { background-color: #6c757d !important; color: white; }
+        .status-in-delivery { background-color: #d94040 !important; color: white; }
+        .status-transferred { background-color: #5a9fd4 !important; color: white; }
+        
+        /* 月度反馈列布局 */
+        .monthly-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 左侧表单，右侧图表 */
+            gap: 20px;
+            margin-top: 12px;
+        }
+        .monthly-form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .monthly-chart-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        /* 进度详情展示 */
+        .progress-detail {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 0.85rem;
+        }
+        .progress-detail strong {
+            color: var(--primary);
+        }
+        
+        /* 清理模式弹窗 */
+        .clear-modal {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px;
+            width: 95%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+        .clear-options {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .clear-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .clear-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+        }
+        .clear-option label {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .company-select-container {
+            margin-top: 10px;
+        }
+        .company-select-container select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1.5px solid var(--border);
+            font-size: 0.9rem;
+            background: #fafbfc;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <header class="app-header">
+        <div class="logo"><span class="icon">CR</span>CRCCRE质监"三阶四验"</div>
+        <div class="header-actions">
+            <span style="font-size:0.82rem;opacity:0.8;">cr7</span>
+            <button class="btn btn-outline btn-sm" onclick="exportAllData()" title="导出全部数据">📥 导出</button>
+            <button class="btn btn-outline btn-sm" onclick="importAllData()" title="导入数据">📤 导入</button>
+            <button class="btn btn-outline btn-sm" onclick="openClearModal()" title="清理数据">🗑️ 清理</button>
+            <span class="user-badge" id="userBadge" onclick="setUserName()">👤 用户</span>
+        </div>
+    </header>
+
+    <!-- 主导航 -->
+    <nav class="main-nav" id="mainNav">
+        <div class="nav-tab active" data-page="dashboard">📊 首页仪表盘</div>
+        <div class="nav-tab" data-page="projects">📋 项目管理</div>
+        <div class="nav-tab" data-page="monthly">📅 月度反馈</div>
+        <div class="nav-tab" data-page="overview">📑 反馈跟踪</div>
+        <div class="nav-tab" data-page="annual">🗓️ 年度竣备交付</div>
+    </nav>
+
+    <!-- 主内容 -->
+    <div class="main-content" id="mainContent">
+        <!-- 首页仪表盘 -->
+        <div class="page active" id="page-dashboard">
+            <div class="card">
+                <div class="card-header">📊 项目仪表盘 <span style="font-weight:400;font-size:0.8rem;color:var(--text-secondary);">共 <span id="totalProjects">0</span> 个项目</span></div>
+                <div class="chart-row">
+                    <div class="chart-container"><canvas id="chartStatus"></canvas></div>
+                    <div class="chart-container"><canvas id="chartCompany"></canvas></div>
+                </div>
+                <div class="chart-row" style="margin-top:12px;">
+                    <div class="chart-container"><canvas id="chartType"></canvas></div>
+                    <div class="chart-container"><canvas id="chartAreaByCompany"></canvas></div>
+                </div>
+                <div class="chart-row" style="margin-top:12px;">
+                    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;" id="statsMini"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">🏗️ 施工总承包单位一览表</div>
+                <div class="table-wrap" id="contractorTableContainer"></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">🚨 项目预警概览</div>
+                <div class="project-cards" id="dashboardCards"></div>
+                <div id="noWarnMsg" style="text-align:center;padding:20px;color:var(--text-secondary);">✅ 暂无预警项目</div>
+            </div>
+        </div>
+
+        <!-- 项目管理 -->
+        <div class="page" id="page-projects">
+            <div class="card">
+                <div class="card-header">📋 项目信息管理
+                    <button class="btn btn-primary btn-sm" onclick="openProjectModal()">+ 新建项目</button>
+                </div>
+                <div class="table-wrap">
+                    <table id="projectTable">
+                        <thead><tr><th>所属公司</th><th>项目名称</th><th>类型</th><th>分期/标段</th><th>状态</th><th>交付标准</th><th>交付户数</th><th>竣备时间</th><th>交付时间</th><th>负责人</th><th>操作</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 月度反馈 -->
+        <div class="page" id="page-monthly">
+            <div class="card">
+                <div class="card-header">📅 月度信息反馈
+                    <select id="monthlyProjectSelect" onchange="loadMonthlyFeedback()" style="padding:8px 12px;border-radius:6px;border:1px solid var(--border);font-size:0.9rem;">
+                        <option value="">-- 选择项目标段 --</option>
+                    </select>
+                </div>
+                <div id="monthlyContent" style="display:none;">
+                    <!-- 进度概况 -->
+                    <div class="card" id="sectionProgress" style="background:#fafbfc;">
+                        <div class="card-header">📈 进度概况 <span class="badge badge-blue">月反馈期: 每月20日至月底</span></div>
+                        <div class="monthly-form-grid">
+                            <div class="monthly-form-section">
+                                <div class="form-grid" id="progressFields">
+                                    <div class="form-group"><label>室内进度 (%)</label><input type="number" id="progIndoor" min="0" max="100" step="0.1" onchange="calcOverallProgress()"></div>
+                                    <div class="form-group"><label>公区进度 (%)</label><input type="number" id="progPublic" min="0" max="100" step="0.1" onchange="calcOverallProgress()"></div>
+                                    <div class="form-group"><label>外立面进度 (%)</label><input type="number" id="progFacade" min="0" max="100" step="0.1" onchange="calcOverallProgress()"></div>
+                                    <div class="form-group"><label>室外进度 (%)</label><input type="number" id="progOutdoor" min="0" max="100" step="0.1" onchange="calcOverallProgress()"></div>
+                                    <div class="form-group"><label>地下室进度 (%)</label><input type="number" id="progBasement" min="0" max="100" step="0.1" onchange="calcOverallProgress()"></div>
+                                    <div class="form-group"><label>总体进度 (自动)</label><input type="text" id="progOverall" disabled></div>
+                                </div>
+                                <div style="margin-top:12px;font-weight:600;">最慢楼栋进度</div>
+                                <div class="form-grid" style="margin-top:6px;">
+                                    <div class="form-group"><label>楼栋号</label><input type="text" id="slowBuildingNo" placeholder="如12#（31F）"></div>
+                                    <div class="form-group"><label>砼 (%)</label><input type="number" id="slowConc" min="0" max="100" step="0.1"></div>
+                                    <div class="form-group"><label>砌体 (%)</label><input type="number" id="slowMasonry" min="0" max="100" step="0.1"></div>
+                                    <div class="form-group"><label>抹灰 (%)</label><input type="number" id="slowPlaster" min="0" max="100" step="0.1"></div>
+                                    <div class="form-group"><label>精装 (%)</label><input type="number" id="slowFinish" min="0" max="100" step="0.1"></div>
+                                    <div class="form-group"><label>部品 (%)</label><input type="number" id="slowParts" min="0" max="100" step="0.1"></div>
+                                    <div class="form-group"><label>保温 (%)</label><input type="number" id="slowInsulation" min="0" max="100" step="0.1"></div>
+                                    <div class="form-group"><label>外墙涂料 (%)</label><input type="number" id="slowCoating" min="0" max="100" step="0.1"></div>
+                                </div>
+                            </div>
+                            <div class="monthly-chart-section">
+                                <div class="chart-container" style="max-height:350px;"><canvas id="chartProgress"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 三阶四验 -->
+                    <div class="card" id="sectionThreeFour" style="background:#fafbfc;">
+                        <!-- 三阶四验概况 -->
+                        <div class="card-header">📋 三阶四验概况 <span class="badge badge-blue">涵盖四个关键阶段</span></div>
+                        
+                        <!-- 【1】施工过程管理阶段（1）月/季检&观感+实测 -->
+                        <div style="font-weight:600;margin-bottom:6px;">【1】施工过程管理阶段（1）月/季检&观感+实测</div>
+                        <div id="qualityChecksContainer"></div>
+                        <button class="btn btn-sm btn-ghost" onclick="addQualityCheck()" style="margin-top:6px;">+ 添加检查记录</button>
+                        <hr style="margin:14px 0;border-color:#e0e0e0;">
+                        
+                        <!-- 【2】交付前联合验收阶段（2）承接查验 -->
+                        <div style="font-weight:600;margin-bottom:6px;">【2】交付前联合验收阶段（2）承接查验</div>
+                        <div class="form-grid" id="acceptanceChecks"></div>
+                        <div style="margin-top:8px;font-size:0.85rem;color:var(--text-secondary);">
+                            累计已开展轮数: <strong id="accRoundCount">0</strong> | 累计剩余问题: <strong id="accRemainIssues">0</strong>条 | 户均问题: <strong id="accPerHousehold">0</strong>条
+                        </div>
+                        <hr style="margin:14px 0;border-color:#e0e0e0;">
+                        
+                        <!-- 【2】交付前联合验收阶段（3）交付联合评估 -->
+                        <div style="font-weight:600;margin-bottom:6px;">【2】交付前联合验收阶段（3）交付联合评估</div>
+                        <div class="form-grid">
+                            <div class="form-group"><label>状态</label><select id="assessStatus" onchange="toggleAssessment()"><option value="未开展">未开展</option><option value="已开展">已开展</option></select></div>
+                            <div class="form-group"><label id="assessDateLabel">计划时间</label><input type="date" id="assessDate"></div>
+                        </div>
+                        <div id="assessPhotos"></div>
+                        <hr style="margin:14px 0;border-color:#e0e0e0;">
+                        
+                        <!-- 【3】业主交付验收阶段（4）工地开放日 -->
+                        <div style="font-weight:600;margin-bottom:6px;">【3】业主交付验收阶段（4）工地开放日</div>
+                        <div class="form-grid">
+                            <div class="form-group"><label>状态</label><select id="openDayStatus" onchange="toggleOpenDay()"><option value="未开展">未开展</option><option value="已开展">已开展</option></select></div>
+                            <div class="form-group"><label id="openDayDateLabel">计划时间</label><input type="date" id="openDayDate"></div>
+                            <div class="form-group" id="openDayGuestsGroup" style="display:none;"><label>接待客户组数</label><input type="number" id="openDayGuests" min="0"></div>
+                        </div>
+                        <div id="openDayPhotos"></div>
+                    </div>
+                    <!-- 两个1反馈 -->
+                    <div class="card" id="sectionTwoOne" style="background:#fff9db;display:none;">
+                        <div class="card-header">🎯 "两个1"反馈 <span class="badge badge-yellow">仅集中交付期</span></div>
+                        <div class="form-grid">
+                            <div class="form-group"><label>指标1 户均问题≤1条 (交付后7天填报)</label><textarea id="twoOne1" rows="2" placeholder="截止X月X日，应交付X户，实交付X户，户均问题x条"></textarea></div>
+                            <div class="form-group"><label>指标2 万平面渗漏点≤1个 (交付后第3/6个月)</label><textarea id="twoOne2" rows="2" placeholder="截止X月X日，项目整体渗漏点，万平面渗漏点x个"></textarea></div>
+                        </div>
+                        <div class="form-group" style="margin-top:8px;"><label>第6个月签字附件</label><input type="file" id="twoOneAttachment" accept="image/*,.pdf" multiple></div>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveMonthlyFeedback()" style="margin-top:12px;">💾 保存月度反馈</button>
+                    <span id="monthlySaveTime" style="font-size:0.8rem;color:var(--text-secondary);margin-left:10px;"></span>
+                </div>
+                <div id="monthlyPlaceholder" style="text-align:center;padding:30px;color:var(--text-secondary);">请先选择一个项目标段</div>
+            </div>
+        </div>
+
+        <!-- 反馈跟踪 -->
+        <div class="page" id="page-overview">
+            <div class="card">
+                <div class="card-header">📑 进度、三阶四验反馈概况</div>
+                <div class="table-wrap" id="overviewTableD1"></div>
+            </div>
+            <div class="card">
+                <div class="card-header">📑 两个1反馈概况</div>
+                <div class="table-wrap" id="overviewTableD2"></div>
+            </div>
+        </div>
+
+        <!-- 年度竣备交付 -->
+        <div class="page" id="page-annual">
+            <div class="card">
+                <div class="card-header">🗓️ 年度竣备、交付项目进度一览表
+                    <select id="annualYear" onchange="renderAnnualTable()" style="padding:8px 12px;border-radius:6px;border:1px solid var(--border);">
+                        <option value="2025">2025年</option><option value="2026" selected>2026年</option><option value="2027">2027年</option><option value="2028">2028年</option>
+                    </select>
+                </div>
+                <div class="table-wrap" id="annualTableContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 项目编辑弹窗 -->
+    <div class="modal-overlay" id="projectModal" style="display:none;">
+        <div class="modal" id="projectModalInner">
+            <h3 id="modalTitle">新建项目</h3>
+            <div class="form-grid" id="projectFormFields"></div>
+            <div style="margin-top:12px;font-weight:600;">分期/标段列表</div>
+            <div id="phaseListContainer"></div>
+            <button class="btn btn-sm btn-ghost" onclick="addPhaseRow()" style="margin-top:8px;">+ 添加分期/标段</button>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" onclick="closeProjectModal()">取消</button>
+                <button class="btn btn-primary" id="saveProjectBtn" onclick="saveProject()">保存项目</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 清理模式弹窗 -->
+    <div class="modal-overlay" id="clearModal" style="display:none;">
+        <div class="clear-modal">
+            <h3>🗑️ 一键清理数据</h3>
+            <p style="color:var(--text-secondary);margin-bottom:16px;">请选择要清理的数据范围</p>
+            <div class="clear-options">
+                <div class="clear-option">
+                    <input type="radio" id="clearAll" name="clearOption" value="all" checked>
+                    <label for="clearAll">全部数据</label>
+                </div>
+                <div class="clear-option">
+                    <input type="radio" id="clearCompany" name="clearOption" value="company">
+                    <label for="clearCompany">按公司</label>
+                    <div class="company-select-container" id="companySelectContainer" style="display:none;">
+                        <select id="companySelect">
+                            <option value="">-- 选择公司 --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" onclick="closeClearModal()">取消</button>
+                <button class="btn btn-danger" onclick="performClear()">确认清理</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图片预览模态框 -->
+    <div class="img-modal" id="imgModal" style="display:none;">
+        <div class="img-modal-content">
+            <img id="modalImg" src="" alt="放大图片">
+        </div>
+    </div>
+
+    <!-- 隐藏的文件导入 -->
+    <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="handleImportFile(event)">
+
+    <script>
+        // ============ 全局状态 ============
+        const COMPANY_ORDER = ['北方', '雄安', '华中', '华东', '贵州', '西南', '南沙', '创新'];
+        const STATUS_OPTIONS = ['未开工', '在建', '竣备待交付', '停工', '集中交付期内', '已移交物业'];
+        const DELIVERY_STANDARDS = ['毛坯', '精装', '毛坯+精装'];
+        const PROJECT_TYPES = ['操盘', '合作', '代建'];
+        const SLOW_PROGRESS_KEYS = ['砼', '砌体', '抹灰', '精装', '部品', '保温', '外墙涂料'];
+        let currentUser = localStorage.getItem('crccre_user') || '用户';
+        let editingProjectId = null;
+        let currentMonthlyPhaseKey = null;
+        let tempPhases = [];
+        let chartProgressInstance = null;
+        let chartStatusInstance = null;
+        let chartCompanyInstance = null;
+        let chartTypeInstance = null;
+        let chartAreaByCompanyInstance = null;
+        document.getElementById('userBadge').textContent = '👤 ' + currentUser;
+
+        // ============ 数据存储 ============
+        function getProjects() { return JSON.parse(localStorage.getItem('crccre_projects') || '[]'); }
+
+        function saveProjects(projects) { localStorage.setItem('crccre_projects', JSON.stringify(projects)); }
+
+        function getPhaseKey(projectId, phaseId) { return projectId + '|||' + phaseId; }
+
+        function parsePhaseKey(key) { const parts = key.split('|||'); return { projectId: parts[0], phaseId: parts[1] }; }
+
+        function findPhaseByKey(key) {
+            const { projectId, phaseId } = parsePhaseKey(key);
+            const projects = getProjects();
+            const project = projects.find(p => p.id === projectId);
+            if (!project) return null;
+            const phase = (project.phases || []).find(ph => ph.id === phaseId);
+            return phase ? { project, phase, projectId, phaseId } : null;
+        }
+
+        function getAllPhaseEntries() {
+            const entries = [];
+            const projects = getProjects();
+            for (const project of projects) {
+                for (const phase of (project.phases || [])) {
+                    entries.push({ project, phase, key: getPhaseKey(project.id, phase.id) });
+                }
+            }
+            return entries;
+        }
+
+        // ============ Toast ============
+        function showToast(msg, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 2500);
+        }
+
+        // ============ 图片预览 ============
+        function showImageModal(src) {
+            document.getElementById('modalImg').src = src;
+            document.getElementById('imgModal').style.display = 'flex';
+        }
+
+        document.getElementById('imgModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+
+        // ============ 导航 ============
+        document.getElementById('mainNav').addEventListener('click', function(e) {
+            if (e.target.classList.contains('nav-tab')) {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                const pageId = e.target.dataset.page;
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById('page-' + pageId).classList.add('active');
+                if (pageId === 'dashboard') refreshDashboard();
+                if (pageId === 'projects') renderProjectTable();
+                if (pageId === 'overview') renderOverviewTables();
+                if (pageId === 'annual') renderAnnualTable();
+                if (pageId === 'monthly') populateMonthlySelect();
+            }
+        });
+
+        // ============ 用户设置 ============
+        function setUserName() {
+            const name = prompt('请输入您的昵称/账号：', currentUser);
+            if (name && name.trim()) {
+                currentUser = name.trim();
+                localStorage.setItem('crccre_user', currentUser);
+                document.getElementById('userBadge').textContent = '👤 ' + currentUser;
+                showToast('用户已更新');
+            }
+        }
+
+        // ============ 一键清理 ============
+        function openClearModal() {
+            document.getElementById('clearModal').style.display = 'flex';
+        }
+
+        function closeClearModal() {
+            document.getElementById('clearModal').style.display = 'none';
+        }
+
+        // 监听清理选项变化
+        document.querySelectorAll('input[name="clearOption"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'company') {
+                    document.getElementById('companySelectContainer').style.display = 'block';
+                    populateCompanySelect();
+                } else {
+                    document.getElementById('companySelectContainer').style.display = 'none';
+                }
+            });
+        });
+
+        function populateCompanySelect() {
+            const select = document.getElementById('companySelect');
+            select.innerHTML = '<option value="">-- 选择公司 --</option>';
+            COMPANY_ORDER.forEach(company => {
+                const option = document.createElement('option');
+                option.value = company;
+                option.textContent = company;
+                select.appendChild(option);
+            });
+        }
+
+        function performClear() {
+            const option = document.querySelector('input[name="clearOption"]:checked').value;
+            let confirmed = false;
+            let projects = getProjects();
+
+            if (option === 'all') {
+                confirmed = confirm('⚠️ 您正在执行"清理全部数据"操作！\n此操作将永久删除所有项目及其相关数据，无法恢复。\n\n请再次确认是否继续？');
+                if (confirmed) {
+                    saveProjects([]);
+                    showToast('✅ 全部数据已清理');
+                }
+            } else if (option === 'company') {
+                const selectedCompany = document.getElementById('companySelect').value;
+                if (!selectedCompany) {
+                    showToast('请先选择一个公司', 'error');
+                    return;
+                }
+                const count = projects.filter(p => p.company === selectedCompany).length;
+                confirmed = confirm(`⚠️ 您正在执行"清理"${selectedCompany}"公司数据"操作！\n此操作将永久删除该公司下的 ${count} 个项目及其相关数据，无法恢复。\n\n请再次确认是否继续？`);
+                if (confirmed) {
+                    const filteredProjects = projects.filter(p => p.company !== selectedCompany);
+                    saveProjects(filteredProjects);
+                    showToast(`✅ "${selectedCompany}"公司数据已清理`);
+                }
+            }
+
+            if (confirmed) {
+                closeClearModal();
+                // 刷新所有页面数据
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById('page-dashboard').classList.add('active');
+                refreshDashboard();
+                renderProjectTable();
+                populateMonthlySelect();
+                renderOverviewTables();
+                renderAnnualTable();
+            }
+        }
+
+        // ============ 首页仪表盘 ============
+        function refreshDashboard() {
+            const entries = getAllPhaseEntries();
+            document.getElementById('totalProjects').textContent = entries.length;
+            // 状态分布
+            const statusCount = {};
+            STATUS_OPTIONS.forEach(s => statusCount[s] = 0);
+            entries.forEach(e => { if (statusCount[e.phase.status] !== undefined) statusCount[e.phase.status]++; });
+            // 公司分布
+            const companyCount = {};
+            COMPANY_ORDER.forEach(c => companyCount[c] = 0);
+            const projectCompanySet = new Set();
+            entries.forEach(e => {
+                companyCount[e.project.company] = (companyCount[e.project.company] || 0) + 1;
+                projectCompanySet.add(e.project.id);
+            });
+            // 类型分布
+            const typeCount = { '操盘': 0, '合作': 0, '代建': 0 };
+            const projects = getProjects();
+            projects.forEach(p => { if (typeCount[p.type] !== undefined) typeCount[p.type]++; });
+            
+            // 各公司面积分布
+            const areaByCompany = {};
+            COMPANY_ORDER.forEach(c => areaByCompany[c] = 0);
+            projects.forEach(p => {
+                if (p.area) {
+                    const area = parseFloat(p.area) || 0;
+                    areaByCompany[p.company] = (areaByCompany[p.company] || 0) + area;
+                }
+            });
+
+            renderChart('chartStatus', 'bar', '项目状态分布', Object.keys(statusCount), Object.values(statusCount), [
+                '#3a9d5d', '#2c5f8a', '#e8a817', '#6b7d8e', '#d94040', '#5a9fd4'
+            ], chartStatusInstance, inst => { chartStatusInstance = inst; });
+            renderChart('chartCompany', 'bar', '各公司标段数量', Object.keys(companyCount), Object.values(companyCount), [
+                '#1a3c5e', '#2c5f8a', '#3a7db5', '#5a9fd4', '#e8a817', '#d94040', '#3a9d5d', '#6b7d8e'
+            ], chartCompanyInstance, inst => { chartCompanyInstance = inst; });
+            renderChart('chartType', 'doughnut', '项目类型分布', Object.keys(typeCount), Object.values(typeCount), [
+                '#3a9d5d', '#e8a817', '#2c5f8a'
+            ], chartTypeInstance, inst => { chartTypeInstance = inst; });
+            renderChart('chartAreaByCompany', 'bar', '各公司面积分布(万㎡)', Object.keys(areaByCompany), Object.values(areaByCompany), [
+                '#1a3c5e', '#2c5f8a', '#3a7db5', '#5a9fd4', '#e8a817', '#d94040', '#3a9d5d', '#6b7d8e'
+            ], chartAreaByCompanyInstance, inst => { chartAreaByCompanyInstance = inst; });
+
+            // 迷你统计
+            const totalProjectsCount = projects.length;
+            const inProgress = statusCount['在建'] || 0;
+            const delivered = statusCount['集中交付期内'] || 0;
+            document.getElementById('statsMini').innerHTML = `
+            <div class="stat-mini"><div class="val">${totalProjectsCount}</div><div class="lbl">项目总数</div></div>
+            <div class="stat-mini"><div class="val">${inProgress}</div><div class="lbl">在建标段</div></div>
+            <div class="stat-mini"><div class="val">${delivered}</div><div class="lbl">集中交付期</div></div>
+            <div class="stat-mini"><div class="val">${statusCount['竣备待交付']||0}</div><div class="lbl">竣备待交付</div></div>
+          `;
+
+            // 项目卡片
+            renderDashboardCards(entries);
+            
+            // 施工总承包单位一览表
+            renderContractorTable(entries);
+        }
+
+        function renderContractorTable(entries) {
+            const container = document.getElementById('contractorTableContainer');
+            const contractorMap = {};
+            entries.forEach(e => {
+                if (e.phase.contractor) {
+                    if (!contractorMap[e.phase.contractor]) {
+                        contractorMap[e.phase.contractor] = { count: 0, companies: [] };
+                    }
+                    contractorMap[e.phase.contractor].count++;
+                    if (!contractorMap[e.phase.contractor].companies.includes(e.project.company)) {
+                        contractorMap[e.phase.contractor].companies.push(e.project.company);
+                    }
+                }
+            });
+            
+            let html = '<table><thead><tr><th>施工总承包单位</th><th>项目标段数</th><th>涉及公司</th></tr></thead><tbody>';
+            for (const [contractor, info] of Object.entries(contractorMap)) {
+                html += `<tr>
+                  <td class="text-left">${contractor}</td>
+                  <td>${info.count}</td>
+                  <td>${info.companies.join(', ')}</td>
+                </tr>`;
+            }
+            html += '</tbody></table>';
+            container.innerHTML = html || '<div style="padding:20px;text-align:center;color:var(--text-secondary);">暂无数据</div>';
+        }
+
+        function renderDashboardCards(entries) {
+            const container = document.getElementById('dashboardCards');
+            const noWarn = document.getElementById('noWarnMsg');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            let hasWarn = false;
+            let cardsHtml = '';
+            // 按项目分组
+            const projectGroups = {};
+            entries.forEach(e => {
+                if (!projectGroups[e.project.id]) projectGroups[e.project.id] = { project: e.project, phases: [] };
+                projectGroups[e.project.id].phases.push(e.phase);
+            });
+            for (const [pid, group] of Object.entries(projectGroups)) {
+                const proj = group.project;
+                let worstWarn = 'none'; // none, yellow, red
+                let warnReason = '';
+                for (const phase of group.phases) {
+                    if (!phase.deliveryDate || phase.status === '未开工' || phase.status === '停工' || phase.status === '已移交物业') continue;
+                    const deliveryDate = new Date(phase.deliveryDate + 'T00:00:00');
+                    const daysToDelivery = Math.ceil((deliveryDate - today) / (1000 * 60 * 60 * 24));
+                    const accR1 = phase.acceptanceChecks?.round1?.status === '已开展';
+                    const accR2 = phase.acceptanceChecks?.round2?.status === '已开展';
+                    const accR3 = phase.acceptanceChecks?.round3?.status === '已开展';
+                    const openDayDone = phase.openDay?.status === '已开展';
+                    if (daysToDelivery <= 90 && daysToDelivery > 105 && !accR1) {
+                        if (worstWarn !== 'red') worstWarn = 'yellow';
+                        warnReason = '距交付≤3.5月，首轮承查未开展';
+                    }
+                    if (daysToDelivery <= 90 && !accR1) {
+                        worstWarn = 'red';
+                        warnReason = '距交付≤3月，首轮承查未开展';
+                    }
+                    if (daysToDelivery <= 15 && !openDayDone && phase.openDay?.status !== '已开展') {
+                        worstWarn = 'red';
+                        warnReason = '距交付≤15天，工地开放日未开展';
+                    }
+                }
+                if (worstWarn !== 'none') hasWarn = true;
+                const cardClass = worstWarn === 'red' ? 'warn-red' : (worstWarn === 'yellow' ? 'warn-yellow' : '');
+                const warnDot = worstWarn === 'red' ? '<span class="warn-dot red"></span>' : (worstWarn ===
+                    'yellow' ? '<span class="warn-dot yellow"></span>' : '');
+                const phaseStatuses = group.phases.map(p => p.status).join('、');
+                const openDayStatuses = group.phases.map(p => p.openDay?.status || '未开展').join('、');
+                const assessStatuses = group.phases.map(p => p.jointAssessment?.status || '未开展').join('、');
+                cardsHtml += `
+            <div class="project-card ${cardClass}" onclick="switchToProject('${pid}')">
+              <div class="card-title">${warnDot}${proj.name} <span class="badge badge-gray" style="font-size:0.7rem;">${proj.company}</span></div>
+              <div style="font-size:0.82rem;">分期状态: ${phaseStatuses}</div>
+              <div class="card-meta">
+                <span>类型: ${proj.type}</span><span>开放日: ${openDayStatuses}</span><span>联合评估: ${assessStatuses}</span>
+                ${warnReason ? `<span style="background:#fde8e8;color:#b91c1c;">⚠${warnReason}</span>` : ''}
+              </div>
+            </div>`;
+            }
+            container.innerHTML = cardsHtml;
+            noWarn.style.display = hasWarn ? 'none' : 'block';
+        }
+
+        function switchToProject(projectId) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.nav-tab[data-page="projects"]').classList.add('active');
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-projects').classList.add('active');
+            renderProjectTable();
+            setTimeout(() => {
+                const row = document.querySelector(`[data-project-id="${projectId}"]`);
+                if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        }
+
+        function renderChart(canvasId, type, label, labels, data, colors, existingInstance, setInstance) {
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) return;
+            if (existingInstance) existingInstance.destroy();
+            const inst = new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{ label: label, data: data, backgroundColor: colors.slice(0, labels.length),
+                        borderColor: colors.slice(0, labels.length), borderWidth: 1 }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
+                    scales: type === 'bar' ? { y: { beginAtZero: true, ticks: { stepSize: 1 } } } : {}
+                }
+            });
+            setInstance(inst);
+        }
+
+        // ============ 项目管理 ============
+        function getStatusClass(status) {
+            switch(status) {
+                case '未开工': return 'status-unstarted';
+                case '在建': return 'status-under-construction';
+                case '竣备待交付': return 'status-ready-delivery';
+                case '停工': return 'status-stopped';
+                case '集中交付期内': return 'status-in-delivery';
+                case '已移交物业': return 'status-transferred';
+                default: return '';
+            }
+        }
+
+        function renderProjectTable() {
+            const projects = getProjects();
+            // 按公司顺序排序
+            const sortedProjects = [...projects].sort((a, b) => {
+                const companyA = a.company || '';
+                const companyB = b.company || '';
+                return COMPANY_ORDER.indexOf(companyA) - COMPANY_ORDER.indexOf(companyB);
+            });
+            
+            const tbody = document.querySelector('#projectTable tbody');
+            let html = '';
+            sortedProjects.forEach(proj => {
+                const phases = proj.phases || [];
+                if (phases.length === 0) {
+                    html += `<tr data-project-id="${proj.id}">
+                <td class="text-left"><strong>${proj.company||''}</strong></td>
+                <td class="text-left"><strong>${proj.name}</strong></td>
+                <td>${proj.type||''}</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>${proj.engineer||''}</td>
+                <td><button class="btn btn-sm btn-ghost" onclick="openProjectModal('${proj.id}')">编辑</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteProject('${proj.id}')">删除</button></td></tr>`;
+                } else {
+                    phases.forEach((ph, idx) => {
+                        const statusClass = getStatusClass(ph.status);
+                        html += `<tr data-project-id="${proj.id}">
+                  <td class="text-left"><strong>${idx===0?proj.company||'':''}</strong></td>
+                  <td class="text-left">${idx===0?'<strong>'+proj.name+'</strong>':''}</td>
+                  <td>${idx===0?(proj.type||''):''}</td>
+                  <td>${ph.name||''}</td>
+                  <td class="${statusClass}">${ph.status||''}</td>
+                  <td>${ph.deliveryStandard||''}</td>
+                  <td>${ph.deliveryHouseholds||0}</td>
+                  <td>${ph.completionDate||''}</td>
+                  <td>${ph.deliveryDate||''}</td>
+                  <td>${idx===0?(proj.engineer||''):''}</td>
+                  <td>${idx===0?`<button class="btn btn-sm btn-ghost" onclick="openProjectModal('${proj.id}')">编辑</button>
+                  <button class="btn btn-sm btn-danger" onclick="deleteProject('${proj.id}')">删除</button>`:''}</td></tr>`;
+                    });
+                }
+            });
+            tbody.innerHTML = html || '<tr><td colspan="11">暂无项目，点击右上角新建</td></tr>';
+        }
+
+        function openProjectModal(projectId) {
+            editingProjectId = projectId || null;
+            tempPhases = [];
+            const projects = getProjects();
+            const project = projectId ? projects.find(p => p.id === projectId) : null;
+            document.getElementById('modalTitle').textContent = project ? '编辑项目' : '新建项目';
+            let formHtml = `
+          <div class="form-group"><label>项目名称</label><input type="text" id="projName" value="${project?.name||''}" placeholder="城市名+项目案名"></div>
+          <div class="form-group"><label>所属公司</label><select id="projCompany">${COMPANY_ORDER.map(c=>`<option value="${c}" ${project?.company===c?'selected':''}>${c}</option>`).join('')}</select></div>
+          <div class="form-group"><label>项目面积 (万m²)</label><input type="text" id="projArea" value="${project?.area||''}"></div>
+          <div class="form-group"><label>工程负责人</label><input type="text" id="projEngineer" value="${project?.engineer||''}"></div>
+          <div class="form-group"><label>项目类型</label><select id="projType" onchange="toggleTypeFields()">${PROJECT_TYPES.map(t=>`<option value="${t}" ${project?.type===t?'selected':''}>${t}</option>`).join('')}</select></div>
+          <div id="typeExtraFields"></div>
+        `;
+            document.getElementById('projectFormFields').innerHTML = formHtml;
+            if (project && project.phases) tempPhases = JSON.parse(JSON.stringify(project.phases));
+            toggleTypeFields();
+            renderPhaseList();
+            document.getElementById('projectModal').style.display = 'flex';
+        }
+
+        function toggleTypeFields() {
+            const type = document.getElementById('projType')?.value || '操盘';
+            let extra = '';
+            if (type === '操盘') {
+                const projects = getProjects();
+                const project = editingProjectId ? projects.find(p => p.id === editingProjectId) : null;
+                extra = `
+            <div class="form-group"><label>土地获取时间</label><input type="date" id="projLandDate" value="${project?.landDate||''}"></div>
+            <div class="form-group"><label>开盘时间</label><input type="date" id="projOpenDate" value="${project?.openDate||''}"></div>`;
+            } else if (type === '合作') {
+                const project = editingProjectId ? getProjects().find(p => p.id === editingProjectId) : null;
+                extra = `
+            <div class="form-group"><label>合作方</label><input type="text" id="projPartner" value="${project?.partner||''}"></div>
+            <div class="form-group"><label>我司股比</label><input type="text" id="projShareRatio" value="${project?.shareRatio||''}"></div>
+            <div class="form-group"><label>我司条线</label><input type="text" id="projLines" value="${project?.lines||''}"></div>`;
+            } else if (type === '代建') {
+                const project = editingProjectId ? getProjects().find(p => p.id === editingProjectId) : null;
+                extra = `
+            <div class="form-group"><label>业主方</label><input type="text" id="projOwner" value="${project?.owner||''}"></div>
+            <div class="form-group"><label>土地获取时间</label><input type="date" id="projLandDate2" value="${project?.landDate||''}"></div>
+            <div class="form-group"><label>代建中标时间</label><input type="date" id="projBidDate" value="${project?.bidDate||''}"></div>
+            <div class="form-group"><label>代建条线</label><input type="text" id="projAgentLines" value="${project?.agentLines||''}"></div>
+            <div class="form-group"><label>品牌输出</label><select id="projBrandOutput"><option value="是" ${project?.brandOutput==='是'?'selected':''}>是</option><option value="否" ${project?.brandOutput==='否'?'selected':''}>否</option></select></div>`;
+            }
+            document.getElementById('typeExtraFields').innerHTML = extra;
+        }
+
+        function renderPhaseList() {
+            const container = document.getElementById('phaseListContainer');
+            let html = '';
+            tempPhases.forEach((ph, idx) => {
+                html += `
+          <div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin:8px 0;background:#fafbfc;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <strong>标段 #${idx+1}</strong>
+              <button class="btn btn-sm btn-danger" onclick="removePhaseRow(${idx})">✕</button>
+            </div>
+            <div class="form-grid">
+              <div class="form-group"><label>分期标段名</label><input type="text" value="${ph.name||''}" onchange="tempPhases[${idx}].name=this.value"></div>
+              <div class="form-group"><label>标段面积 (万m²)</label><input type="text" value="${ph.area||''}" onchange="tempPhases[${idx}].area=this.value"></div>
+              <div class="form-group"><label>项目状态</label><select onchange="tempPhases[${idx}].status=this.value">${STATUS_OPTIONS.map(s=>`<option value="${s}" ${ph.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+              <div class="form-group"><label>施工总承包单位</label><input type="text" value="${ph.contractor||''}" onchange="tempPhases[${idx}].contractor=this.value"></div>
+              <div class="form-group"><label>交付标准</label><select onchange="tempPhases[${idx}].deliveryStandard=this.value">${DELIVERY_STANDARDS.map(d=>`<option value="${d}" ${ph.deliveryStandard===d?'selected':''}>${d}</option>`).join('')}</select></div>
+              <div class="form-group"><label>交付户数</label><input type="number" value="${ph.deliveryHouseholds||''}" onchange="tempPhases[${idx}].deliveryHouseholds=parseInt(this.value)||0"></div>
+              <div class="form-group"><label>竣备时间</label><input type="date" value="${ph.completionDate||''}" onchange="tempPhases[${idx}].completionDate=this.value"></div>
+              <div class="form-group"><label>交付时间</label><input type="date" value="${ph.deliveryDate||''}" onchange="tempPhases[${idx}].deliveryDate=this.value"></div>
+              <div class="form-group"><label>销售合同交付时间</label><input type="date" value="${ph.contractDeliveryDate||''}" onchange="tempPhases[${idx}].contractDeliveryDate=this.value"></div>
+              <div class="form-group"><label>承接查验启动时间</label><input type="date" value="${ph.inspectionStartDate||''}" onchange="tempPhases[${idx}].inspectionStartDate=this.value" ${ph.inspectionStartDate?'disabled':''}></div>
+              <div class="form-group"><label>工地开放日计划时间</label><input type="date" value="${ph.openDayPlanDate||''}" onchange="tempPhases[${idx}].openDayPlanDate=this.value"></div>
+              <div class="form-group"><label>交付联合评估计划时间</label><input type="date" value="${ph.jointAssessmentPlanDate||''}" onchange="tempPhases[${idx}].jointAssessmentPlanDate=this.value"></div>
+              <div class="form-group"><label>交付范围</label><input type="text" value="${ph.deliveryScope||''}" onchange="tempPhases[${idx}].deliveryScope=this.value"></div>
+            </div>
+          </div>`;
+            });
+            container.innerHTML = html || '<div style="color:var(--text-secondary);padding:8px;">暂无标段，请添加</div>';
+        }
+
+        function addPhaseRow() {
+            tempPhases.push({
+                id: 'phase_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                name: '',
+                area: '',
+                status: '在建',
+                contractor: '',
+                deliveryStandard: '毛坯',
+                deliveryHouseholds: 0,
+                completionDate: '',
+                deliveryDate: '',
+                contractDeliveryDate: '',
+                inspectionStartDate: '',
+                openDayPlanDate: '',
+                jointAssessmentPlanDate: '',
+                deliveryScope: '',
+                progress: { indoor: 0, public: 0, facade: 0, outdoor: 0, basement: 0, slowBuildingNo: '',
+                    slowProgress: {} },
+                qualityChecks: [],
+                acceptanceChecks: { round1: { status: '未开展', remainingIssues: 0 }, round2: { status: '未开展',
+                        remainingIssues: 0 }, round3: { status: '未开展', remainingIssues: 0 } },
+                openDay: { status: '未开展', actualDate: '', guests: 0, photos: [] },
+                jointAssessment: { status: '未开展', actualDate: '', photos: [] },
+                twoOne: { indicator1: '', indicator2: '', attachment: [] },
+                lastUpdateTime: '',
+                lastUpdateUser: ''
+            });
+            renderPhaseList();
+        }
+
+        function removePhaseRow(idx) { 
+            tempPhases.splice(idx, 1);
+            renderPhaseList(); 
+        }
+
+        function closeProjectModal() { 
+            document.getElementById('projectModal').style.display = 'none';
+            editingProjectId = null;
+            tempPhases = []; 
+        }
+
+        function saveProject() {
+            const name = document.getElementById('projName').value.trim();
+            if (!name) { showToast('请输入项目名称', 'error'); return; }
+            const company = document.getElementById('projCompany').value;
+            const area = document.getElementById('projArea').value;
+            const engineer = document.getElementById('projEngineer').value;
+            const type = document.getElementById('projType').value;
+            let extraData = {};
+            if (type === '操盘') {
+                extraData.landDate = document.getElementById('projLandDate')?.value || '';
+                extraData.openDate = document.getElementById('projOpenDate')?.value || '';
+            } else if (type === '合作') {
+                extraData.partner = document.getElementById('projPartner')?.value || '';
+                extraData.shareRatio = document.getElementById('projShareRatio')?.value || '';
+                extraData.lines = document.getElementById('projLines')?.value || '';
+            } else if (type === '代建') {
+                extraData.owner = document.getElementById('projOwner')?.value || '';
+                extraData.landDate = document.getElementById('projLandDate2')?.value || '';
+                extraData.bidDate = document.getElementById('projBidDate')?.value || '';
+                extraData.agentLines = document.getElementById('projAgentLines')?.value || '';
+                extraData.brandOutput = document.getElementById('projBrandOutput')?.value || '否';
+            }
+            const projects = getProjects();
+            let project;
+            if (editingProjectId) {
+                project = projects.find(p => p.id === editingProjectId);
+                if (!project) { showToast('项目不存在', 'error'); return; }
+                project.name = name;
+                project.company = company;
+                project.area = area;
+                project.engineer = engineer;
+                project.type = type;
+                Object.assign(project, extraData);
+                // 保留已有phase数据，合并tempPhases
+                const existingPhaseIds = tempPhases.filter(p => project.phases?.some(ep => ep.id === p.id)).map(p => p
+                    .id);
+                const keptPhases = (project.phases || []).filter(ep => existingPhaseIds.includes(ep.id));
+                const newPhases = tempPhases.filter(p => !existingPhaseIds.includes(p.id));
+                // 更新已存在的phase
+                tempPhases.forEach(tp => {
+                    const existingIdx = (project.phases || []).findIndex(ep => ep.id === tp.id);
+                    if (existingIdx >= 0) {
+                        // 保留原有的进度、三阶四验等数据
+                        const oldPhase = project.phases[existingIdx];
+                        project.phases[existingIdx] = { ...oldPhase, ...tp, progress: oldPhase.progress || tp
+                                .progress, qualityChecks: oldPhase.qualityChecks || tp.qualityChecks,
+                            acceptanceChecks: oldPhase.acceptanceChecks || tp.acceptanceChecks, openDay: oldPhase
+                                .openDay || tp.openDay, jointAssessment: oldPhase.jointAssessment || tp
+                                .jointAssessment, twoOne: oldPhase.twoOne || tp.twoOne,
+                            lastUpdateTime: oldPhase.lastUpdateTime || '', lastUpdateUser: oldPhase
+                                .lastUpdateUser || '' };
+                    }
+                });
+                // 添加新phase
+                newPhases.forEach(np => { if (!project.phases) project.phases = [];
+                    project.phases.push(np); });
+                // 移除不在tempPhases中的phase
+                const tempPhaseIds = tempPhases.map(p => p.id);
+                project.phases = (project.phases || []).filter(p => tempPhaseIds.includes(p.id));
+            } else {
+                project = {
+                    id: 'proj_' + Date.now(),
+                    name,
+                    company,
+                    area,
+                    engineer,
+                    type,
+                    ...extraData,
+                    phases: tempPhases.map(p => ({ ...p, progress: { indoor: 0, public: 0, facade: 0, outdoor: 0,
+                            basement: 0, slowBuildingNo: '', slowProgress: {} }, qualityChecks: [],
+                        acceptanceChecks: { round1: { status: '未开展', remainingIssues: 0 }, round2: { status: '未开展',
+                                remainingIssues: 0 }, round3: { status: '未开展', remainingIssues: 0 } },
+                        openDay: { status: '未开展', actualDate: '', guests: 0, photos: [] },
+                        jointAssessment: { status: '未开展', actualDate: '', photos: [] }, twoOne: { indicator1: '',
+                            indicator2: '', attachment: [] }, lastUpdateTime: '', lastUpdateUser: '' }))
+                };
+                projects.push(project);
+            }
+            saveProjects(projects);
+            closeProjectModal();
+            renderProjectTable();
+            refreshDashboard();
+            populateMonthlySelect();
+            showToast('项目保存成功');
+        }
+
+        function deleteProject(projectId) {
+            if (!confirm('确定删除此项目及其所有数据吗？此操作不可恢复。')) return;
+            let projects = getProjects();
+            projects = projects.filter(p => p.id !== projectId);
+            saveProjects(projects);
+            renderProjectTable();
+            refreshDashboard();
+            populateMonthlySelect();
+            showToast('项目已删除');
+        }
+
+        // ============ 月度反馈 ============
+        function populateMonthlySelect() {
+            const select = document.getElementById('monthlyProjectSelect');
+            const entries = getAllPhaseEntries();
+            select.innerHTML = '<option value="">-- 选择项目标段 --</option>';
+            COMPANY_ORDER.forEach(comp => {
+                const compEntries = entries.filter(e => e.project.company === comp);
+                if (compEntries.length > 0) {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = comp;
+                    compEntries.forEach(e => {
+                        const opt = document.createElement('option');
+                        opt.value = e.key;
+                        opt.textContent = `${e.project.name} - ${e.phase.name}`;
+                        optgroup.appendChild(opt);
+                    });
+                    select.appendChild(optgroup);
+                }
+            });
+        }
+
+        function loadMonthlyFeedback() {
+            const key = document.getElementById('monthlyProjectSelect').value;
+            if (!key) { document.getElementById('monthlyContent').style.display = 'none';
+                document.getElementById('monthlyPlaceholder').style.display = 'block'; return; }
+            currentMonthlyPhaseKey = key;
+            document.getElementById('monthlyContent').style.display = 'block';
+            document.getElementById('monthlyPlaceholder').style.display = 'none';
+            const found = findPhaseByKey(key);
+            if (!found) return;
+            const phase = found.phase;
+            const isTransferred = phase.status === '已移交物业';
+            const isDeliveryPeriod = phase.status === '集中交付期内';
+            const isNotStarted = phase.status === '未开工';
+            const hideProgress = isDeliveryPeriod || isNotStarted || isTransferred;
+            document.getElementById('sectionProgress').style.display = hideProgress ? 'none' : 'block';
+            document.getElementById('sectionThreeFour').style.display = isNotStarted || isTransferred ? 'none' : 'block';
+            document.getElementById('sectionTwoOne').style.display = isDeliveryPeriod ? 'block' : 'none';
+            // 填充进度数据
+            const prog = phase.progress || {};
+            document.getElementById('progIndoor').value = prog.indoor ?? 0;
+            document.getElementById('progPublic').value = prog.public ?? 0;
+            document.getElementById('progFacade').value = prog.facade ?? 0;
+            document.getElementById('progOutdoor').value = prog.outdoor ?? 0;
+            document.getElementById('progBasement').value = prog.basement ?? 0;
+            calcOverallProgress();
+            document.getElementById('slowBuildingNo').value = prog.slowBuildingNo || '';
+            SLOW_PROGRESS_KEYS.forEach(k => {
+                const el = document.getElementById('slow' + k.replace(/[^a-zA-Z]/g, ''));
+                if (!el) {
+                    const map = { '砼': 'Conc', '砌体': 'Masonry', '抹灰': 'Plaster', '精装': 'Finish', '部品': 'Parts',
+                        '保温': 'Insulation', '外墙涂料': 'Coating' };
+                    const el2 = document.getElementById('slow' + map[k]);
+                    if (el2) el2.value = (prog.slowProgress && prog.slowProgress[k]) ?? 0;
+                } else {
+                    el.value = (prog.slowProgress && prog.slowProgress[k]) ?? 0;
+                }
+            });
+            // 质量检查
+            renderQualityChecks(phase);
+            // 承接查验
+            const acc = phase.acceptanceChecks || { round1: { status: '未开展', remainingIssues: 0 }, round2: { status: '未开展',
+                    remainingIssues: 0 }, round3: { status: '未开展', remainingIssues: 0 } };
+            ['round1', 'round2', 'round3'].forEach(r => {
+                const selEl = document.getElementById('acc_' + r + '_status');
+                const numEl = document.getElementById('acc_' + r + '_issues');
+                if (selEl) selEl.value = acc[r]?.status || '未开展';
+                if (numEl) { numEl.value = acc[r]?.remainingIssues || 0;
+                    numEl.disabled = (acc[r]?.status || '未开展') !== '已开展'; }
+            });
+            updateAccSummary();
+            // 联合评估
+            document.getElementById('assessStatus').value = phase.jointAssessment?.status || '未开展';
+            document.getElementById('assessDate').value = phase.jointAssessment?.actualDate || phase
+                .jointAssessmentPlanDate || '';
+            document.getElementById('assessDateLabel').textContent = (phase.jointAssessment?.status === '已开展') ? '实际日期' :
+                '计划时间';
+            renderPhotos('assessPhotos', phase.jointAssessment?.photos || [], 'assess');
+            // 开放日
+            document.getElementById('openDayStatus').value = phase.openDay?.status || '未开展';
+            document.getElementById('openDayDate').value = phase.openDay?.actualDate || phase.openDayPlanDate || '';
+            document.getElementById('openDayDateLabel').textContent = (phase.openDay?.status === '已开展') ? '实际日期' : '计划时间';
+            document.getElementById('openDayGuestsGroup').style.display = (phase.openDay?.status === '已开展') ? 'block' :
+                'none';
+            document.getElementById('openDayGuests').value = phase.openDay?.guests || 0;
+            renderPhotos('openDayPhotos', phase.openDay?.photos || [], 'openDay');
+            // 两个1
+            document.getElementById('twoOne1').value = phase.twoOne?.indicator1 || '';
+            document.getElementById('twoOne2').value = phase.twoOne?.indicator2 || '';
+            document.getElementById('monthlySaveTime').textContent = phase.lastUpdateTime ? '上次更新: ' + phase.lastUpdateTime +
+                ' by ' + (phase.lastUpdateUser || '') : '';
+            // 渲染进度图
+            setTimeout(() => renderProgressChart(prog), 200);
+        }
+
+        function calcOverallProgress() {
+            const vals = [
+                parseFloat(document.getElementById('progIndoor').value) || 0,
+                parseFloat(document.getElementById('progPublic').value) || 0,
+                parseFloat(document.getElementById('progFacade').value) || 0,
+                parseFloat(document.getElementById('progOutdoor').value) || 0,
+                parseFloat(document.getElementById('progBasement').value) || 0
+            ];
+            const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+            document.getElementById('progOverall').value = avg.toFixed(1) + '%';
+        }
+
+        function renderProgressChart(prog) {
+            if (chartProgressInstance) chartProgressInstance.destroy();
+            const ctx = document.getElementById('chartProgress');
+            if (!ctx) return;
+            const labels = ['室内', '公区', '外立面', '室外', '地下室', '总体'];
+            const data = [
+                prog?.indoor || 0, prog?.public || 0, prog?.facade || 0, prog?.outdoor || 0, prog?.basement || 0,
+                ((prog?.indoor || 0) + (prog?.public || 0) + (prog?.facade || 0) + (prog?.outdoor || 0) + (prog
+                    ?.basement || 0)) / 5
+            ];
+            const slowData = SLOW_PROGRESS_KEYS.map(k => (prog?.slowProgress && prog.slowProgress[k]) || 0);
+            chartProgressInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [...labels, ...SLOW_PROGRESS_KEYS],
+                    datasets: [
+                        { label: '分类进度 (%)', data: [...data, ...Array(SLOW_PROGRESS_KEYS.length).fill(null)],
+                            backgroundColor: '#2c5f8a', borderRadius: 4 },
+                        { label: '最慢楼栋进度 (%)', data: [...Array(labels.length).fill(null), ...slowData],
+                            backgroundColor: '#e8a817', borderRadius: 4 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } },
+                    scales: { y: { beginAtZero: true, max: 100 } } }
+            });
+        }
+
+        function renderQualityChecks(phase) {
+            const container = document.getElementById('qualityChecksContainer');
+            const checks = phase.qualityChecks || [];
+            let html = '';
+            checks.forEach((qc, idx) => {
+                html += `
+          <div style="border:1px solid #ddd;border-radius:6px;padding:10px;margin:6px 0;background:#fff;">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <select onchange="updateQualityCheck(${idx},'checkMonth',this.value)"><option value="">检查月份</option>${generateMonthOptions(qc.checkMonth)}</select>
+              <select onchange="updateQualityCheck(${idx},'checkType',this.value)">
+                <option value="质检小组季度" ${qc.checkType==='质检小组季度'?'selected':''}>质检小组季度</option>
+                <option value="质检小组月检" ${qc.checkType==='质检小组月检'?'selected':''}>质检小组月检</option>
+                <option value="质检+项目组联合月检" ${qc.checkType==='质检+项目组联合月检'?'selected':''}>质检+项目组联合月检</option>
+                <option value="项目组月检" ${qc.checkType==='项目组月检'?'selected':''}>项目组月检</option>
+              </select>
+              <input type="date" value="${qc.checkDate||''}" onchange="updateQualityCheck(${idx},'checkDate',this.value)" style="width:140px;">
+              <label>实测得分:</label><input type="number" value="${qc.score||''}" onchange="updateQualityCheck(${idx},'score',parseFloat(this.value)||0)" style="width:80px;" step="0.1" min="0" max="100">%
+              <button class="btn btn-sm btn-danger" onclick="removeQualityCheck(${idx})">✕</button>
+            </div>
+          </div>`;
+            });
+            container.innerHTML = html || '<div style="color:var(--text-secondary);">暂无检查记录</div>';
+        }
+
+        function generateMonthOptions(selected) {
+            let opts = '';
+            for (let y = 2024; y <= 2028; y++) {
+                for (let m = 1; m <= 12; m++) {
+                    const val = `${y}-${String(m).padStart(2,'0')}`;
+                    opts += `<option value="${val}" ${selected===val?'selected':''}>${val}</option>`;
+                }
+            }
+            return opts;
+        }
+
+        function addQualityCheck() {
+            if (!currentMonthlyPhaseKey) return;
+            const found = findPhaseByKey(currentMonthlyPhaseKey);
+            if (!found) return;
+            if (!found.phase.qualityChecks) found.phase.qualityChecks = [];
+            found.phase.qualityChecks.push({ checkMonth: '', checkType: '质检小组月检', checkDate: '', score: 0 });
+            saveProjects(getProjects());
+            renderQualityChecks(found.phase);
+        }
+
+        function updateQualityCheck(idx, field, value) {
+            if (!currentMonthlyPhaseKey) return;
+            const found = findPhaseByKey(currentMonthlyPhaseKey);
+            if (!found || !found.phase.qualityChecks) return;
+            found.phase.qualityChecks[idx][field] = value;
+            saveProjects(getProjects());
+        }
+
+        function removeQualityCheck(idx) {
+            if (!currentMonthlyPhaseKey) return;
+            const found = findPhaseByKey(currentMonthlyPhaseKey);
+            if (!found || !found.phase.qualityChecks) return;
+            found.phase.qualityChecks.splice(idx, 1);
+            saveProjects(getProjects());
+            renderQualityChecks(found.phase);
+        }
+
+        function toggleOpenDay() {
+            const status = document.getElementById('openDayStatus').value;
+            document.getElementById('openDayDateLabel').textContent = status === '已开展' ? '实际日期' : '计划时间';
+            document.getElementById('openDayGuestsGroup').style.display = status === '已开展' ? 'block' : 'none';
+            if (!currentMonthlyPhaseKey) return;
+            const found = findPhaseByKey(currentMonthlyPhaseKey);
+            if (!found) return;
+            if (!found.phase.openDay) found.phase.openDay = { status: '未开展', actualDate: '', guests: 0, photos: [] };
+            found.phase.openDay.status = status;
+            if (status === '未开展') {
+                document.getElementById('openDayDate').value = found.phase.openDayPlanDate || '';
+            }
+            saveProjects(getProjects());
+        }
+
+        function toggleAssessment() {
+            const status = document.getElementById('assessStatus').value;
+            document.getElementById('assessDateLabel').textContent = status === '已开展' ? '实际日期' : '计划时间';
+            if (!currentMonthlyPhaseKey) return;
+            const found = findPhaseByKey(currentMonthlyPhaseKey);
+            if (!found) return;
+            if (!found.phase.jointAssessment) found.phase.jointAssessment = { status: '未开展', actualDate: '', photos: [] };
+            found.phase.jointAssessment.status = status;
+            if (status === '未开展') {
+                document.getElementById('assessDate').value = found.phase.jointAssessmentPlanDate || '';
+            }
+            saveProjects(getProjects());
+        }
+
+        function updateAccSummary() {
+            if (!currentMonthlyPhaseKey) return;
+            const found = findPhaseByKey(currentMonthlyPhaseKey);
+            if (!found) return;
+            const acc = found.phase.acceptanceChecks || { round1: { status: '未开展', remainingIssues: 0 }, round2: { status: '未开展',
+                    remainingIssues: 0 }, round3: { status: '未开展', remainingIssues: 0 } };
+            let y = 0,
+                z = 0;
+            ['round1', 'round2', 'round3'].forEach(r => {
+                if (acc[r]?.status === '已开展') { y = Math.max(y, parseInt(r.replace('round', '')));
+                    z += acc[r]?.remainingIssues || 0; }
+            });
+            const households = found.phase.deliveryHouseholds || 1;
+            const m = households > 0 ? (z / households).toFixed(2) : 0;
+            document.getElementById('accRoundCount').textContent = y;
+            document.getElementById('accRemainIssues').textContent = z;
+            document.getElementById('accPerHousehold').textContent = m;
+        }
+
+        // 承接查验状态变更监听
+        document.addEventListener('change', function(e) {
+            if (e.target.id && e.target.id.startsWith('acc_round') && e.target.id.endsWith('_status')) {
+                const roundKey = e.target.id.replace('_status', '');
+                const issuesEl = document.getElementById(roundKey + '_issues');
+                if (issuesEl) issuesEl.disabled = e.target.value !== '已开展';
+                if (!currentMonthlyPhaseKey) return;
+                const found = findPhaseByKey(currentMonthlyPhaseKey);
+                if (!found) return;
+                const roundNum = roundKey.replace('acc_', '');
+                if (!found.phase.acceptanceChecks) found.phase.acceptanceChecks = { round1: { status: '未开展',
+                        remainingIssues: 0 }, round2: { status: '未开展', remainingIssues: 0 }, round3: { status: '未开展',
+                        remainingIssues: 0 } };
+                found.phase.acceptanceChecks[roundNum] = found.phase.acceptanceChecks[roundNum] || { status: '未开展',
+                    remainingIssues: 0 };
+                found.phase.acceptanceChecks[roundNum].status = e.target.value;
+                saveProjects(getProjects());
+                updateAccSummary();
+            }
+            if (e.target.id && e.target.id.startsWith('acc_round') && e.target.id.endsWith('_issues')) {
+                if (!currentMonthlyPhaseKey) return;
+                const found = findPhaseByKey(currentMonthlyPhaseKey);
+                if (!found) return;
+                const roundNum = e.target.id.replace('acc_', '').replace('_issues', '');
+                if (!found.phase.acceptanceChecks) found.phase.acceptanceChecks = { round1: { status: '未开展',
+                        remainingIssues: 0 }, round2: { status: '未开展', remainingIssues: 0 }, round3: { status: '未开展',
+                        remainingIssues: 0 } };
+                found.phase.acceptanceChecks[roundNum] = found.phase.acceptanceChecks[roundNum] || { status: '未开展',
+                    remainingIssues: 0 };
+                found.phase.acceptanceChecks[roundNum].remainingIssues = parseInt(e.target.value) || 0;
+                saveProjects(getProjects());
+                updateAccSummary();
+            }
+        });
+
+        function renderPhotos(containerId, photos, prefix) {
+            const container = document.getElementById(containerId);
+            let html = '<div class="photo-preview">';
+            (photos || []).forEach((photo, idx) => {
+                html +=
+                    `<div class="photo-item"><img src="${photo}" alt="照片${idx+1}" onclick="showImageModal('${photo}')"><button class="del-photo" onclick="deletePhoto('${prefix}',${idx})">✕</button></div>`;
+            });
+            html += '</div>';
+            html +=
+                `<input type="file" accept="image/*" multiple onchange="addPhotos('${prefix}',this)" style="margin-top:6px;">`;
+            container.innerHTML = html;
+        }
+
+        function addPhotos(prefix, input) {
+            if (!currentMonthlyPhaseKey || !input.files.length) return;
+            const found = findPhaseByKey(currentMonthlyPhaseKey);
+            if (!found) return;
+            const files = Array.from(input.files);
+            let photos = [];
+            if (prefix === 'openDay') {
+                if (!found.phase.openDay) found.phase.openDay = { status: '未开展', actualDate: '', guests: 0, photos: [] };
+                photos = found.phase.openDay.photos || [];
+            } else if (prefix === 'assess') {
+                if (!found.phase.jointAssessment) found.phase.jointAssessment = { status: '未开展', actualDate: '',
+                photos: [] };
+                photos = found.phase.jointAssessment.photos || [];
+            }
+            let loaded = 0;
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photos.push(e.target.result);
+                    loaded++;
+                    if (loaded === files.length) {
+                        if (prefix === 'openDay') found.phase.openDay.photos = photos;
+                        if (prefix === 'assess') found.phase.jointAssessment.photos = photos;
+                        saveProjects(getProjects());
+                        renderPhotos(prefix === 'openDay' ? 'openDayPhotos' : 'assessPhotos', photos, prefix);
+                        showToast('照片已添加');
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+            input.value = '';
+        }
+
+        function deletePhoto(prefix, idx) {
+            if (!currentMonthlyPhaseKey) return;
+            const found = findPhaseByKey(currentMonthlyPhaseKey);
+            if (!found) return;
+            let photos = [];
+            if (prefix === 'openDay' && found.phase.openDay) photos = found.phase.openDay.photos || [];
+            if (prefix === 'assess' && found.phase.jointAssessment) photos = found.phase.jointAssessment.photos || [];
+            photos.splice(idx, 1);
+            if (prefix === 'openDay') found.phase.openDay.photos = photos;
+            if (prefix === 'assess') found.phase.jointAssessment.photos = photos;
+            saveProjects(getProjects());
+            renderPhotos(prefix === 'openDay' ? 'openDayPhotos' : 'assessPhotos', photos, prefix);
+        }
+
+        function saveMonthlyFeedback() {
+            if (!currentMonthlyPhaseKey) { showToast('请先选择项目标段', 'error'); return; }
+            const found = findPhaseByKey(currentMonthlyPhaseKey);
+            if (!found) { showToast('数据异常', 'error'); return; }
+            const phase = found.phase;
+            const isTransferred = phase.status === '已移交物业';
+            const isDeliveryPeriod = phase.status === '集中交付期内';
+            const isNotStarted = phase.status === '未开工';
+            if (!isNotStarted && !isDeliveryPeriod && !isTransferred) {
+                phase.progress = {
+                    indoor: parseFloat(document.getElementById('progIndoor').value) || 0,
+                    public: parseFloat(document.getElementById('progPublic').value) || 0,
+                    facade: parseFloat(document.getElementById('progFacade').value) || 0,
+                    outdoor: parseFloat(document.getElementById('progOutdoor').value) || 0,
+                    basement: parseFloat(document.getElementById('progBasement').value) || 0,
+                    slowBuildingNo: document.getElementById('slowBuildingNo').value,
+                    slowProgress: {}
+                };
+                SLOW_PROGRESS_KEYS.forEach(k => {
+                    const map = { '砼': 'Conc', '砌体': 'Masonry', '抹灰': 'Plaster', '精装': 'Finish', '部品': 'Parts',
+                        '保温': 'Insulation', '外墙涂料': 'Coating' };
+                    const el = document.getElementById('slow' + map[k]);
+                    if (el) phase.progress.slowProgress[k] = parseFloat(el.value) || 0;
+                });
+            }
+            if (!isNotStarted && !isTransferred) {
+                phase.openDay = phase.openDay || { status: '未开展', actualDate: '', guests: 0, photos: [] };
+                phase.openDay.status = document.getElementById('openDayStatus').value;
+                phase.openDay.actualDate = document.getElementById('openDayDate').value;
+                phase.openDay.guests = parseInt(document.getElementById('openDayGuests').value) || 0;
+                phase.jointAssessment = phase.jointAssessment || { status: '未开展', actualDate: '', photos: [] };
+                phase.jointAssessment.status = document.getElementById('assessStatus').value;
+                phase.jointAssessment.actualDate = document.getElementById('assessDate').value;
+                // 质量检查已在实时更新中保存
+                // 承接查验也在实时更新中保存
+            }
+            if (isDeliveryPeriod) {
+                phase.twoOne = phase.twoOne || { indicator1: '', indicator2: '', attachment: [] };
+                phase.twoOne.indicator1 = document.getElementById('twoOne1').value;
+                phase.twoOne.indicator2 = document.getElementById('twoOne2').value;
+            }
+            // 自动记录承接查验启动时间
+            if (!phase.inspectionStartDate && phase.acceptanceChecks) {
+                const anyStarted = Object.values(phase.acceptanceChecks).some(acc => acc.status === '已开展');
+                if (anyStarted) {
+                    phase.inspectionStartDate = new Date().toISOString().split('T')[0];
+                    showToast('承接查验启动时间已自动记录');
+                }
+            }
+            phase.lastUpdateTime = new Date().toLocaleString('zh-CN');
+            phase.lastUpdateUser = currentUser;
+            saveProjects(getProjects());
+            document.getElementById('monthlySaveTime').textContent = '上次更新: ' + phase.lastUpdateTime + ' by ' + currentUser;
+            refreshDashboard();
+            showToast('月度反馈保存成功');
+        }
+
+        // ============ 反馈跟踪 ============
+        function renderOverviewTables() {
+            const entries = getAllPhaseEntries();
+            // 按公司排序
+            entries.sort((a, b) => COMPANY_ORDER.indexOf(a.project.company) - COMPANY_ORDER.indexOf(b.project.company));
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const currentMonth = today.getMonth() + 1;
+            const currentYear = today.getFullYear();
+            const feedbackStart = new Date(currentYear, currentMonth - 1, 20);
+            const feedbackEnd = new Date(currentYear, currentMonth, 1);
+            feedbackEnd.setDate(0); // 月底
+            const inFeedbackWindow = today >= feedbackStart && today <= feedbackEnd;
+            // 进度、三阶四验反馈概况
+            let d1Html = `<table><thead><tr><th>所属公司</th><th>标段名称</th><th>进度</th><th>三阶四验：月检反馈</th><th>三阶四验：承查</th><th>三阶四验：联合评估</th><th>三阶四验：开放日</th><th>最近更新时间</th></tr></thead><tbody>`;
+            const d1Entries = entries.filter(e => e.phase.status !== '集中交付期内' && e.phase.status !== '未开工' && e.phase.status !== '已移交物业');
+            d1Entries.forEach(e => {
+                const phase = e.phase;
+                const progOverall = phase.progress ? ((phase.progress.indoor || 0) + (phase.progress.public || 0) + (
+                    phase.progress.facade || 0) + (phase.progress.outdoor || 0) + (phase.progress.basement || 0)) /
+                    5 : 0;
+                const lastCheck = (phase.qualityChecks && phase.qualityChecks.length > 0) ? phase.qualityChecks[
+                    phase.qualityChecks.length - 1] : null;
+                const hasUpdatedThisMonth = phase.lastUpdateTime && new Date(phase.lastUpdateTime) >= feedbackStart &&
+                    new Date(phase.lastUpdateTime) <= feedbackEnd;
+                const isOverdue = inFeedbackWindow && !hasUpdatedThisMonth;
+                const rowClass = isOverdue ? 'cell-red' : '';
+                
+                // 构建最慢楼栋进度详情
+                let slowProgressDetail = '';
+                if (phase.progress && phase.progress.slowBuildingNo) {
+                    slowProgressDetail = `<div class="progress-detail">最慢楼栋: <strong>${phase.progress.slowBuildingNo}</strong><br>`;
+                    for (const [key, value] of Object.entries(phase.progress.slowProgress || {})) {
+                        slowProgressDetail += `${key}: <strong>${value}%</strong> `;
+                    }
+                    slowProgressDetail += '</div>';
+                }
+                
+                d1Html += `<tr class="${rowClass}">
+            <td>${e.project.company}</td>
+            <td class="text-left">${e.project.name} - ${phase.name}</td>
+            <td>${isOverdue&&!hasUpdatedThisMonth?'<span class="text-red">未反馈</span>':('总体:'+progOverall.toFixed(1)+'%<br>'+slowProgressDetail)}</td>
+            <td>${lastCheck?lastCheck.checkType+' 得分:'+lastCheck.score+'%':(isOverdue?'<span class="text-red">未反馈</span>':'暂无')}<br>${phase.lastUpdateTime||''}</td>
+            <td>${getAccSummary(phase.acceptanceChecks)||(isOverdue?'<span class="text-red">未反馈</span>':'计划但暂未开展')}<br>${phase.lastUpdateTime||''}</td>
+            <td>${phase.jointAssessment?.status==='已开展'?phase.jointAssessment.actualDate:(phase.jointAssessmentPlanDate?'计划:'+phase.jointAssessmentPlanDate:'计划但暂未开展')}</td>
+            <td>${phase.openDay?.status==='已开展'?phase.openDay.actualDate:(phase.openDayPlanDate?'计划:'+phase.openDayPlanDate:'计划但暂未开展')}</td>
+            <td>${phase.lastUpdateTime||''}</td></tr>`;
+            });
+            d1Html += '</tbody></table>';
+            document.getElementById('overviewTableD1').innerHTML = d1Html || '<div>暂无数据</div>';
+            // 两个1反馈概况
+            let d2Html =
+                `<table><thead><tr><th>所属公司</th><th>标段名称</th><th>户均问题≤1条</th><th>万平米渗漏点≤1个</th><th>最近更新时间</th></tr></thead><tbody>`;
+            const d2Entries = entries.filter(e => e.phase.status === '集中交付期内');
+            d2Entries.forEach(e => {
+                const phase = e.phase;
+                const hasUpdatedThisMonth = phase.lastUpdateTime && new Date(phase.lastUpdateTime) >= feedbackStart &&
+                    new Date(phase.lastUpdateTime) <= feedbackEnd;
+                const isOverdue = inFeedbackWindow && !hasUpdatedThisMonth;
+                const rowClass = isOverdue ? 'cell-red' : '';
+                d2Html += `<tr class="${rowClass}">
+            <td>${e.project.company}</td>
+            <td class="text-left">${e.project.name} - ${phase.name}</td>
+            <td>${phase.twoOne?.indicator1||(isOverdue?'<span class="text-red">未反馈</span>':'暂无')}</td>
+            <td>${phase.twoOne?.indicator2||(isOverdue?'<span class="text-red">未反馈</span>':'暂无')}</td>
+            <td>${phase.lastUpdateTime||''}</td></tr>`;
+            });
+            d2Html += '</tbody></table>';
+            document.getElementById('overviewTableD2').innerHTML = d2Html || '<div>暂无集中交付期标段</div>';
+        }
+
+        function getAccSummary(acc) {
+            if (!acc) return '';
+            const rounds = ['round1', 'round2', 'round3'];
+            const started = rounds.filter(r => acc[r]?.status === '已开展');
+            if (started.length === 0) return '未开展';
+            return `已开展${started.length}轮, 剩余${started.reduce((s,r)=>s+(acc[r]?.remainingIssues||0),0)}条`;
+        }
+
+        // ============ 年度竣备交付一览表 ============
+        function renderAnnualTable() {
+            const year = parseInt(document.getElementById('annualYear').value);
+            const entries = getAllPhaseEntries();
+            const months = Array.from({ length: 12 }, (_, i) => i + 1);
+            // 筛选该年度需竣备或交付的标段
+            const filtered = entries.filter(e => {
+                const compDate = e.phase.completionDate ? new Date(e.phase.completionDate + 'T00:00:00') : null;
+                const delDate = e.phase.deliveryDate ? new Date(e.phase.deliveryDate + 'T00:00:00') : null;
+                return (compDate && compDate.getFullYear() === year) || (delDate && delDate.getFullYear() === year);
+            });
+            filtered.sort((a, b) => COMPANY_ORDER.indexOf(a.project.company) - COMPANY_ORDER.indexOf(b.project.company));
+            let html = '<table><thead><tr><th>项目标段</th><th>公司</th><th>类型</th>';
+            months.forEach(m => html += `<th>${m}月</th>`);
+            html += '</tr></thead><tbody>';
+            filtered.forEach(e => {
+                const compMonth = e.phase.completionDate ? new Date(e.phase.completionDate + 'T00:00:00').getMonth() +
+                    1 : null;
+                const delMonth = e.phase.deliveryDate ? new Date(e.phase.deliveryDate + 'T00:00:00').getMonth() + 1 :
+                    null;
+                const typeColor = e.project.type === '代建' ? 'cell-yellow' : (e.project.type === '操盘' ? 'cell-green' :
+                    'cell-pink');
+                html +=
+                    `<tr><td class="text-left">${e.project.name} - ${e.phase.name}</td><td>${e.project.company}</td><td>${e.project.type}</td>`;
+                months.forEach(m => {
+                    let cellContent = '';
+                    let cellClass = '';
+                    if (compMonth === m && delMonth === m) {
+                        cellContent = `竣备+交付<br>${e.phase.deliveryStandard||''}<br>${e.phase.deliveryHouseholds||0}户`;
+                        cellClass = 'cell-blue';
+                    } else if (compMonth === m) {
+                        cellContent = '竣备';
+                        cellClass = 'cell-blue';
+                    } else if (delMonth === m) {
+                        cellContent =
+                            `交付<br>${e.phase.deliveryStandard||''}<br>${e.phase.deliveryHouseholds||0}户`;
+                        cellClass = typeColor;
+                    }
+                    html += `<td class="${cellClass}">${cellContent}</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+            if (filtered.length === 0) html = '<div style="padding:20px;text-align:center;color:var(--text-secondary);">该年度暂无竣备或交付项目</div>';
+            document.getElementById('annualTableContainer').innerHTML = html;
+        }
+
+        // ============ 数据导入导出 ============
+        function exportAllData() {
+            const data = {
+                projects: getProjects(),
+                exportTime: new Date().toISOString(),
+                user: currentUser,
+                version: '1.0'
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `CRCCRE_三阶四验_数据备份_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('数据导出成功');
+        }
+
+        function importAllData() {
+            document.getElementById('importFileInput').click();
+        }
+
+        function handleImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!data.projects || !Array.isArray(data.projects)) throw new Error('数据格式不正确');
+                    
+                    // 获取现有项目数据
+                    const existingProjects = getProjects();
+                    // 创建现有项目的ID映射
+                    const existingProjectMap = {};
+                    existingProjects.forEach(project => {
+                        existingProjectMap[project.id] = project;
+                    });
+                    
+                    // 将导入的项目与现有项目合并
+                    const updatedProjects = [...existingProjects]; // 保持原有项目
+                    
+                    data.projects.forEach(importedProject => {
+                        const existingIndex = updatedProjects.findIndex(p => p.id === importedProject.id);
+                        if (existingIndex !== -1) {
+                            // 如果项目存在，则替换它
+                            updatedProjects[existingIndex] = importedProject;
+                        } else {
+                            // 如果项目不存在，则添加它
+                            updatedProjects.push(importedProject);
+                        }
+                    });
+                    
+                    if (!confirm(
+                            `即将导入${data.projects.length}个项目的数据，现有数据将被部分覆盖（保留未在导入文件中的项目）。\n导出时间: ${data.exportTime||'未知'}\n确认继续？`
+                            )) return;
+                    
+                    saveProjects(updatedProjects);
+                    renderProjectTable();
+                    refreshDashboard();
+                    populateMonthlySelect();
+                    renderOverviewTables();
+                    renderAnnualTable();
+                    showToast('数据导入成功');
+                } catch (err) {
+                    showToast('导入失败：' + err.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // ============ 初始化 ============
+        function init() {
+            // 初始化承接查验字段
+            const accContainer = document.getElementById('acceptanceChecks');
+            let accHtml = '';
+            ['round1', 'round2', 'round3'].forEach(r => {
+                const label = r === 'round1' ? '第一轮' : (r === 'round2' ? '第二轮' : '第三轮');
+                accHtml += `
+            <div class="form-group"><label>${label} - 是否开展</label><select id="acc_${r}_status"><option value="未开展">未开展</option><option value="已开展">已开展</option></select></div>
+            <div class="form-group"><label>${label} - 剩余未销项条数</label><input type="number" id="acc_${r}_issues" value="0" min="0" disabled></div>`;
+            });
+            accContainer.innerHTML = accHtml;
+            // 初始化页面
+            renderProjectTable();
+            refreshDashboard();
+            populateMonthlySelect();
+            renderOverviewTables();
+            renderAnnualTable();
+            // 默认加载演示数据（如果为空）
+            if (getProjects().length === 0) {
+                loadDemoData();
+            }
+        }
+
+        function loadDemoData() {
+            const demoProjects = [{
+                id: 'proj_demo1',
+                name: '北京·中铁建未来城',
+                company: '北方',
+                area: '15.8',
+                engineer: '张三',
+                type: '操盘',
+                landDate: '2024-03-15',
+                openDate: '2025-06-01',
+                phases: [{
+                    id: 'phase_demo1a',
+                    name: '一期一标段',
+                    area: '8.5',
+                    status: '在建',
+                    contractor: '中铁建设集团',
+                    deliveryStandard: '精装',
+                    deliveryHouseholds: 480,
+                    completionDate: '2026-09-30',
+                    deliveryDate: '2026-12-31',
+                    contractDeliveryDate: '2026-12-31',
+                    inspectionStartDate: '',
+                    openDayPlanDate: '2026-10-15',
+                    jointAssessmentPlanDate: '2026-11-01',
+                    deliveryScope: '1-6号楼',
+                    progress: { indoor: 65, public: 55, facade: 70, outdoor: 40, basement: 60, slowBuildingNo: '3#（31F）',
+                        slowProgress: { '砼': 100, '砌体': 100, '抹灰': 85, '精装': 45, '部品': 30, '保温': 70,
+                            '外墙涂料': 55 } },
+                    qualityChecks: [{ checkMonth: '2026-04', checkType: '质检小组月检', checkDate: '2026-04-15',
+                        score: 88.5 }],
+                    acceptanceChecks: { round1: { status: '未开展', remainingIssues: 0 }, round2: { status: '未开展',
+                            remainingIssues: 0 }, round3: { status: '未开展', remainingIssues: 0 } },
+                    openDay: { status: '未开展', actualDate: '', guests: 0, photos: [] },
+                    jointAssessment: { status: '未开展', actualDate: '', photos: [] },
+                    twoOne: { indicator1: '', indicator2: '', attachment: [] },
+                    lastUpdateTime: '2026-05-15 14:30:00',
+                    lastUpdateUser: 'cr7'
+                }, {
+                    id: 'phase_demo1b',
+                    name: '一期二标段',
+                    area: '7.3',
+                    status: '在建',
+                    contractor: '中铁十二局',
+                    deliveryStandard: '毛坯+精装',
+                    deliveryHouseholds: 320,
+                    completionDate: '2026-09-30',
+                    deliveryDate: '2026-12-31',
+                    contractDeliveryDate: '2026-12-31',
+                    inspectionStartDate: '',
+                    openDayPlanDate: '2026-10-20',
+                    jointAssessmentPlanDate: '2026-11-05',
+                    deliveryScope: '7-10号楼',
+                    progress: { indoor: 50, public: 40, facade: 55, outdoor: 30, basement: 45, slowBuildingNo: '8#（28F）',
+                        slowProgress: { '砼': 100, '砌体': 90, '抹灰': 60, '精装': 30, '部品': 20, '保温': 50,
+                            '外墙涂料': 40 } },
+                    qualityChecks: [],
+                    acceptanceChecks: { round1: { status: '未开展', remainingIssues: 0 }, round2: { status: '未开展',
+                            remainingIssues: 0 }, round3: { status: '未开展', remainingIssues: 0 } },
+                    openDay: { status: '未开展', actualDate: '', guests: 0, photos: [] },
+                    jointAssessment: { status: '未开展', actualDate: '', photos: [] },
+                    twoOne: { indicator1: '', indicator2: '', attachment: [] },
+                    lastUpdateTime: '',
+                    lastUpdateUser: ''
+                }]
+            }, {
+                id: 'proj_demo2',
+                name: '雄安·智慧社区',
+                company: '雄安',
+                area: '22.5',
+                engineer: '李四',
+                type: '代建',
+                owner: '雄安新区管委会',
+                landDate: '2024-06-01',
+                bidDate: '2024-08-15',
+                agentLines: '工程、成本',
+                brandOutput: '是',
+                phases: [{
+                    id: 'phase_demo2a',
+                    name: '一期',
+                    area: '22.5',
+                    status: '竣备待交付',
+                    contractor: '中建八局',
+                    deliveryStandard: '精装',
+                    deliveryHouseholds: 650,
+                    completionDate: '2026-03-15',
+                    deliveryDate: '2026-06-30',
+                    contractDeliveryDate: '2026-06-30',
+                    inspectionStartDate: '2026-04-01',
+                    openDayPlanDate: '2026-05-10',
+                    jointAssessmentPlanDate: '2026-05-25',
+                    deliveryScope: '全部楼栋',
+                    progress: { indoor: 98, public: 96, facade: 100, outdoor: 90, basement: 95, slowBuildingNo: '5#（25F）',
+                        slowProgress: { '砼': 100, '砌体': 100, '抹灰': 100, '精装': 95, '部品': 90, '保温': 100,
+                            '外墙涂料': 100 } },
+                    qualityChecks: [{ checkMonth: '2026-03', checkType: '质检+项目组联合月检', checkDate: '2026-03-20',
+                        score: 92.3 }],
+                    acceptanceChecks: { round1: { status: '已开展', remainingIssues: 45 }, round2: { status: '已开展',
+                            remainingIssues: 18 }, round3: { status: '未开展', remainingIssues: 0 } },
+                    openDay: { status: '未开展', actualDate: '', guests: 0, photos: [] },
+                    jointAssessment: { status: '未开展', actualDate: '', photos: [] },
+                    twoOne: { indicator1: '', indicator2: '', attachment: [] },
+                    lastUpdateTime: '2026-05-10 09:15:00',
+                    lastUpdateUser: 'cr7'
+                }]
+            }, {
+                id: 'proj_demo3',
+                name: '上海·滨江府',
+                company: '华东',
+                area: '8.6',
+                engineer: '王五',
+                type: '合作',
+                partner: '绿城中国',
+                shareRatio: '51%',
+                lines: '工程、设计',
+                phases: [{
+                    id: 'phase_demo3a',
+                    name: '一期',
+                    area: '8.6',
+                    status: '集中交付期内',
+                    contractor: '浙江建工',
+                    deliveryStandard: '精装',
+                    deliveryHouseholds: 280,
+                    completionDate: '2026-01-20',
+                    deliveryDate: '2026-04-15',
+                    contractDeliveryDate: '2026-04-30',
+                    inspectionStartDate: '2026-02-01',
+                    openDayPlanDate: '2026-03-01',
+                    jointAssessmentPlanDate: '2026-03-20',
+                    deliveryScope: '1-4号楼',
+                    progress: { indoor: 100, public: 100, facade: 100, outdoor: 100, basement: 100, slowBuildingNo: '',
+                        slowProgress: {} },
+                    qualityChecks: [],
+                    acceptanceChecks: { round1: { status: '已开展', remainingIssues: 0 }, round2: { status: '已开展',
+                            remainingIssues: 0 }, round3: { status: '已开展', remainingIssues: 0 } },
+                    openDay: { status: '已开展', actualDate: '2026-03-05', guests: 180, photos: [] },
+                    jointAssessment: { status: '已开展', actualDate: '2026-03-22', photos: [] },
+                    twoOne: { indicator1: '截止4月22日，应交付280户，实交付265户，户均问题0.8条',
+                        indicator2: '截止10月15日，项目整体渗漏点，万平面渗漏点0.5个', attachment: [] },
+                    lastUpdateTime: '2026-05-01 11:00:00',
+                    lastUpdateUser: 'cr7'
+                }]
+            }, {
+                id: 'proj_demo4',
+                name: '广州·云湖花园',
+                company: '华南',
+                area: '12.3',
+                engineer: '赵六',
+                type: '操盘',
+                landDate: '2023-12-10',
+                openDate: '2025-03-15',
+                phases: [{
+                    id: 'phase_demo4a',
+                    name: '一期',
+                    area: '12.3',
+                    status: '已移交物业',
+                    contractor: '广东建工',
+                    deliveryStandard: '精装',
+                    deliveryHouseholds: 520,
+                    completionDate: '2025-10-20',
+                    deliveryDate: '2025-12-15',
+                    contractDeliveryDate: '2025-12-31',
+                    inspectionStartDate: '2025-09-01',
+                    openDayPlanDate: '2025-11-01',
+                    jointAssessmentPlanDate: '2025-11-15',
+                    deliveryScope: '全部楼栋',
+                    progress: { indoor: 100, public: 100, facade: 100, outdoor: 100, basement: 100, slowBuildingNo: '',
+                        slowProgress: {} },
+                    qualityChecks: [{ checkMonth: '2025-11', checkType: '质检小组月检', checkDate: '2025-11-20',
+                        score: 95.2 }],
+                    acceptanceChecks: { round1: { status: '已开展', remainingIssues: 0 }, round2: { status: '已开展',
+                            remainingIssues: 0 }, round3: { status: '已开展', remainingIssues: 0 } },
+                    openDay: { status: '已开展', actualDate: '2025-11-05', guests: 200, photos: [] },
+                    jointAssessment: { status: '已开展', actualDate: '2025-11-18', photos: [] },
+                    twoOne: { indicator1: '截止12月22日，应交付520户，实交付518户，户均问题0.6条',
+                        indicator2: '截止6月15日，项目整体渗漏点，万平面渗漏点0.3个', attachment: [] },
+                    lastUpdateTime: '2025-12-20 10:30:00',
+                    lastUpdateUser: 'cr7'
+                }]
+            }];
+            saveProjects(demoProjects);
+            renderProjectTable();
+            refreshDashboard();
+            populateMonthlySelect();
+            renderOverviewTables();
+            renderAnnualTable();
+        }
+
+        // 启动
+        init();
+        console.log('CRCCRE质监"三阶四验"应用已就绪 | 作者: cr7');
+        console.log('功能: 项目管理 | 月度反馈 | 三阶四验 | 两个1反馈 | 预警系统 | 年度一览表 | 数据导入导出 | 一键清理');
+    </script>
+</body>
+</html>
